@@ -1,0 +1,135 @@
+﻿## This script explains how to create machine learning datasets out of the nerd, Stanford and UW_Twitter_NLP tools output
+
+# The commands in this file assume that there are 10 folders named 1 to 10 that each contain one part of the dataset for 10-fold cross validation. 
+
+####### add POS tags
+# Create input file for pos tagger (make sure the file has two columns, even if the second is only a dummy column, otherwise the tagger will choke) 
+
+cd cross_validation ; 
+
+# The pos tagger assumes proper hashtags and urls, so insert some dummy values here
+for x in {1..10} ; do cd $x ; gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#pgroth/g' | gtr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; cd .. ; done
+
+# Also put second part of the file somewhere 
+for x in {1..10} ; do cd $x ; gcut -f2- -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; cd .. ; done
+
+# Run the pos tagger (check the location of the tagger!)
+for x in {1..10} ; do cd $x ; ./../../../ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; s/\#pgroth/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; cd .. ; done
+
+# Glue the files together 
+for x in {1..10} ; do cd $x ; paste -d" " nerdANDstanfordANDuwtwitternlp_postagged.conll nerdANDstanfordANDuwtwitternlp_complementToPOS > nerdANDstanfordANDuwtwitternlp_POStaggedInputForPostProcessingRules.mcoll ; cd .. ; done 
+
+
+####### run rules (_URL_ can't be an entity etc )Check the location of the RunNERDPostprocessingRules.pl script and adjust the path if necessary  
+
+for x in {1..10} ; do cd $x ; perl ../../../RunNERDPostprocessingRules.pl nerdANDstanfordANDuwtwitternlp_POStaggedInputForPostProcessingRules.mcoll > nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration.mcoll ; cd .. ; done
+
+####### Align with Gold standard to reinsert _ENDOFTWEET_ tokens (needed for some ML features)
+
+for x in {1..10} ; do cd $x ; perl ../../../alignGoldStandardWithNERDOutput.pl validation.GS nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration.mcoll | cut -f3 | sed 's/\%/percent/g'  > nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration_aligned.mcoll ; cd .. ; done  
+
+####### add ML features 
+
+for x in {1..10} ; do cd $x ; perl ../../../AddMLFeaturesAndCLeanUp.pl nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration_aligned.mcoll > ../../MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part$x.mcoll ; cd .. ; done 
+
+####### create training sets 
+
+cd ../MachineLearningExperiments
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun1.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun2.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun3.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun4.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll  nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun5.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun6.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll  nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun7.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun8.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll  nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll >> TrainingRun9.conll
+
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll >> TrainingRun10.conll
+
+####### run machine learning experiments 
+
+cd mallet-2.0.7
+
+###############################
+## Run 1
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run1Model2orders MachineLearningExperiments/TrainingRun1.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run1Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll > MachineLearningExperiments/ResultsRun01_2orders.csv
+
+###############################
+## Run 2
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run2Model2orders  MachineLearningExperiments/TrainingRun2.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run2Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll > MachineLearningExperiments/ResultsRun02_2orders.csv
+
+###############################
+## Run 3
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run3Model2orders  MachineLearningExperiments/TrainingRun3.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run3Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll > MachineLearningExperiments/ResultsRun03_2orders.csv
+
+###############################
+## Run 4
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run4Model2orders  MachineLearningExperiments/TrainingRun4.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run4Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll > MachineLearningExperiments/ResultsRun04_2orders.csv
+
+###############################
+## Run 5
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run5Model2orders  MachineLearningExperiments/TrainingRun5.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run5Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll > MachineLearningExperiments/ResultsRun05_2orders.csv
+
+###############################
+## Run 6
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run6Model2orders  MachineLearningExperiments/TrainingRun6.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run6Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll > MachineLearningExperiments/ResultsRun06_2orders.csv
+
+###############################
+## Run 7
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run7Model2orders  MachineLearningExperiments/TrainingRun7.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run7Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll > MachineLearningExperiments/ResultsRun07_2orders.csv
+
+###############################
+## Run 8
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run8Model2orders  MachineLearningExperiments/TrainingRun8.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run8Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll > MachineLearningExperiments/ResultsRun08_2orders.csv
+
+###############################
+## Run 9
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run9Model2orders  MachineLearningExperiments/TrainingRun9.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run9Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll > MachineLearningExperiments/ResultsRun09_2orders.csv
+
+###############################
+## Run 10
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --orders 2 --train true --model-file MachineLearningExperiments/Run10Model2orders  MachineLearningExperiments/TrainingRun10.conll
+
+java -mx4g -cp "class:lib/mallet-deps.jar" cc.mallet.fst.SimpleTagger --include-input true --model-file MachineLearningExperiments/Run10Model2orders  MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll > MachineLearningExperiments/ResultsRun10_2orders.csv
+
+####### collect results
+
+cd MachineLearningExperiments
+
+### IF new features get added remember that the field of the GS changes (so from 24 to something else) 
+cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll | cut -f1,25 -d" " >> GoldStandard.csv
+
+echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv ; cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll | sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ' | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' >> nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv
+
+
+
+
+

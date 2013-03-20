@@ -1,0 +1,136 @@
+﻿## Weka is slightly pickier than some other machine learning packages regarding its input, so here are a few more commands in order to convert the space separated feature vectors to Weka's ARFF format. 
+
+## Create CSV files with a header that lists the different features (attributes in Weka-lingo)
+cd to/path/of/MachineLearningExperiments 
+ 
+for x in *mcoll ; do echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > $x.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' >> $x.csv ; done
+
+for x in *conll ; do echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > $x.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' >> $x.csv ; done 
+
+echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv ; cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll | sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ' | sed "s/'/quote/g ; s/\%/percent/g " | gtr " " "," | sed '/^$/d' >> nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv
+ 
+## cd to WEKA folder
+ 
+export CLASSPATH=$CLASSPATH:/Applications/weka-3-7-6/weka.jar
+ 
+java weka.core.converters.CSVLoader MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv > MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.arff
+ 
+ 
+# Copy arff header from big file to small files to ensure WEKA's compatibility  
+head -n30 MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.arff > MachineLearningExperiments/March19arffHeader.txt
+
+# Convert all csv files to arff and add big header 
+for x in MachineLearningExperiments/*csv ; do cat  MachineLearningExperiments/March19arffHeader.txt > ${x%csv}arff ; java weka.core.converters.CSVLoader $x | sed '1,30d' >> ${x%csv}arff ; done 
+
+### Run Weka experiments 
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun1.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run1.txt 
+
+# Run 2
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun2.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run2.txt 
+
+# Run 3
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun3.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run3.txt 
+
+# Run 4
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun4.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run4.txt 
+
+# Run 5
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun5.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run5.txt 
+
+# Run 6
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun6.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run6.txt 
+
+# Run 7
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun7.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run7.txt 
+
+# Run 8
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun8.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run8.txt 
+
+# Run 9
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun9.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run9.txt 
+
+# Run 10
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun10.conll.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run10.txt 
+
+#### Convert to CoNLL format
+for x in {1..10} ; do perl ../../ReformatWekaOutputToCoNLL.pl March19IB1_WEKA_output_Run$x.txt > March19IB1_WEKA_output_Run$x_forConllFULL.txt ; done 
+
+### Concatenate and check performance 
+cat March19IB1_WEKA_output_Run1_forConll.txt March19IB1_WEKA_output_Run2_forConll.txt March19IB1_WEKA_output_Run3_forConll.txt March19IB1_WEKA_output_Run4_forConll.txt March19IB1_WEKA_output_Run5_forConll.txt March19IB1_WEKA_output_Run6_forConll.txt March19IB1_WEKA_output_Run7_forConll.txt March19IB1_WEKA_output_Run8_forConll.txt March19IB1_WEKA_output_Run9_forConll.txt March19IB1_WEKA_output_Run10_forConll.txt >> March19IB1_WekaOutput_bigfileFULL.txt  
+
+perl ../../conlleval.pl < March19IB1_WekaOutput_bigfile.txt 
+
+#marieke@robin:MachineLearningExperiments$ perl #../../conlleval.pl < March19IB1_WekaOutput_bigfileFULL.txt
+#processed 41343 tokens with 2528 phrases; found: 2596 phrases; correct: 1853.
+#accuracy:  96.50%; precision:  71.38%; recall:  73.30%; FB1:  72.33
+#              LOC: precision:  76.63%; recall:  74.07%; FB1:  75.32  492
+#             MISC: precision:  22.06%; recall:  24.59%; FB1:  23.26  204
+#              ORG: precision:  55.69%; recall:  59.83%; FB1:  57.68  492
+#              PER: precision:  82.17%; recall:  83.96%; FB1:  83.06  1408
+
+## Align with gold standard to get tweet IDs in
+
+
+
+
+###################### Second series of experiments
+## 
+
+for x in *mcoll ; do echo "token,initcap,capitalisationfrequency,start,alchemy,spotlight,opencalais,textrazor,wikimeta,ritter,stanford,class" > $x.pruned.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' | cut -d"," -f1,3,12,13,15,16,19,21,22,25,26,27 >> $x.pruned.csv ; done
+
+for x in *conll ; do echo "token,initcap,capitalisationfrequency,start,alchemy,spotlight,opencalais,textrazor,wikimeta,ritter,stanford,class"  > $x.pruned.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' | cut -d"," -f1,3,12,13,15,16,19,21,22,25,26,27 >> $x.pruned.csv ; done 
+
+echo "token,initcap,capitalisationfrequency,start,alchemy,spotlight,opencalais,textrazor,wikimeta,ritter,stanford,class" > nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset_pruned.csv ; cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll | sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ' | sed "s/'/quote/g ; s/\%/percent/g" | gtr " " "," | sed '/^$/d'| cut -d"," -f1,3,12,13,15,16,19,21,22,25,26,27 >> nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset_pruned.csv
+ 
+ ## From WEKA folder
+ 
+export CLASSPATH=$CLASSPATH:/Applications/weka-3-7-6/weka.jar
+ 
+java weka.core.converters.CSVLoader MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset_pruned.csv > MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset_pruned.arff
+ 
+ 
+# Copy arff header from big file to small files to ensure WEKA's compatibility  
+head -n16 MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset_pruned.arff > MachineLearningExperiments/March19arffHeader_pruned.txt
+
+# Convert all csv files to arff and add big header 
+for x in MachineLearningExperiments/*mcoll.pruned.csv ; do cat  MachineLearningExperiments/March19arffHeader_pruned.txt > ${x%csv}arff ; java weka.core.converters.CSVLoader $x | sed '1,16d' >> ${x%csv}arff ; done 
+
+
+### WEKA EXPERIMENTS
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun1.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run01.pruned.txt 
+
+# Run 2
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun2.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run02.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun3.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run03.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun4.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run04.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun5.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run05.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun6.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run06.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun7.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run07.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun8.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run08.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun9.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run09.pruned.txt
+
+java -mx2g weka.classifiers.lazy.IBk -t MachineLearningExperiments/TrainingRun10.conll.pruned.arff -T MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll.pruned.arff -p 1 > MachineLearningExperiments/March19IB1_WEKA_output_Run10.pruned.txt
+
+#### Convert to CoNLL format
+for x in March19IB1_WEKA_output_Run*pruned.txt ; do perl ../../ReformatWekaOutputToCoNLL.pl $x > ${x%.txt}_forConll.pruned.txt; done 
+
+### Concatenate and check performance 
+for x in March19IB1_WEKA_output_Run*_forConll.pruned.txt; do cat $x >> March19IB1_WekaOutput_bigfile.pruned.txt ; done 
+
+perl ../../conlleval.pl < March19IB1_WekaOutput_bigfile.pruned.txt 
+
+#marieke@robin:MachineLearningExperiments$ perl ../../conlleval.pl < March19IB1_WekaOutput_bigfile.pruned.txt 
+#processed 51521 tokens with 3138 phrases; found: 3147 phrases; correct: 2212.
+#accuracy:  96.13%; precision:  70.29%; recall:  70.49%; FB1:  70.39
+#              LOC: precision:  76.55%; recall:  74.92%; FB1:  75.72  597
+#             MISC: precision:  23.05%; recall:  25.34%; FB1:  24.14  243
+#              ORG: precision:  54.90%; recall:  53.99%; FB1:  54.44  592
+#              PER: precision:  80.12%; recall:  80.59%; FB1:  80.35  1715
+
