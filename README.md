@@ -14,7 +14,7 @@ NERD, Stanford-CRF and Ritter's UW_Twitter_NLP, as input of a machine learner al
 This documentation explains how to create machine learning datasets out of the NERD, Stanford and UW_Twitter_NLP tools output. 
 The commands in this file assume that there are 10 folders named 1 to 10 that each contain one part of the dataset for 10-fold cross validation.
     
-# add POS tags
+##### add POS tags
     ###### Create input file for pos tagger (make sure the file has two columns, even if the second is only a dummy column, otherwise the tagger will choke) 
     cd cross_validation ;
     ###### The pos tagger assumes proper hashtags and urls, so insert some dummy values here
