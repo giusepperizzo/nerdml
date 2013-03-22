@@ -8,7 +8,7 @@ NERD, Stanford-CRF and Ritter's UW_Twitter_NLP, as input of a machine learner al
 - Weka: http://www.cs.waikato.ac.nz/ml/weka/
 - Stanford-CRF: http://nlp.stanford.edu/software/CRF-NER.shtml
 - Ritter's UW_Twitter_NLP: https://github.com/aritter/twitter_nlp
-
+- ark-tweet-nl: https://code.google.com/p/ark-tweet-nlp/
 
 #### Documentation
 This documentation explains how to create machine learning datasets out of the NERD, Stanford and UW_Twitter_NLP outputs. 
@@ -40,7 +40,8 @@ Create input file for pos tagger (make sure the file has two columns, even if th
     done
     # run the pos tagger (check the location of the tagger!)
     for x in {1..10} ; \
-      do cd $x ; ./../../../ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; \
+      do cd $x ; \
+      ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; \
       s/\#pgroth/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; \
       cd .. ; \
     done
