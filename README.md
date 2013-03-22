@@ -16,11 +16,11 @@ The commands in this file assume that there are 10 folders named 1 to 10 that ea
     
 ##### input
 a CSV file (nerdANDstanfordANDuwtwitternlp.mconll), where the columns are: 
-1st:       token
-2nd:       GS
-3rd..12th: NERD_i parser (alphabetic order)
-13th:      Stanford-CRF
-14th:      Ritter's UW_Twitter_NLP
+- 1st:       token
+- 2nd:       GS
+- 3rd..12th: NERD_i parser (alphabetic order)
+- 13th:      Stanford-CRF
+- 14th:      Ritter's UW_Twitter_NLP
 
 ##### preprocessing
 Create input file for pos tagger (make sure the file has two columns, even if the second is only a dummy column, otherwise the tagger will choke):   
