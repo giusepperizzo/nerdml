@@ -8,7 +8,7 @@ NERD, Stanford-CRF and Ritter's UW_Twitter_NLP, as input of a machine learner al
 - Weka: http://www.cs.waikato.ac.nz/ml/weka/
 - Stanford-CRF: http://nlp.stanford.edu/software/CRF-NER.shtml
 - Ritter's UW_Twitter_NLP: https://github.com/aritter/twitter_nlp
-- ark-tweet-nl: https://code.google.com/p/ark-tweet-nlp/
+- ark-tweet-nlp: https://code.google.com/p/ark-tweet-nlp/
 
 #### Documentation
 This documentation explains how to create machine learning datasets out of the NERD, Stanford and UW_Twitter_NLP outputs. 
