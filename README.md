@@ -27,29 +27,56 @@ Create input file for pos tagger (make sure the file has two columns, even if th
 
     cd cross_validation ;
     # the pos tagger assumes proper hashtags and urls, so insert some dummy values here
-    for x in {1..10} ; do cd $x ; gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#pgroth/g' | gtr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; cd .. ; done
+    for x in {1..10} ; \
+      do cd $x ;\ 
+      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#pgroth/g' | gtr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
+      cd .. ; \
+    done
     # also put second part of the file somewhere 
-    for x in {1..10} ; do cd $x ; gcut -f2- -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; cd .. ; done
+    for x in {1..10} ; \ 
+      do cd $x ;\
+      gcut -f2- -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; \
+      cd .. ; \
+    done
     # run the pos tagger (check the location of the tagger!)
-    for x in {1..10} ; do cd $x ; ./../../../ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; s/\#pgroth/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; cd .. ; done
+    for x in {1..10} ; \
+      do cd $x ; ./../../../ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; \
+      s/\#pgroth/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; \
+      cd .. ; \
+    done
     # glue the files together 
-    for x in {1..10} ; do cd $x ; paste -d" " nerdANDstanfordANDuwtwitternlp_postagged.conll nerdANDstanfordANDuwtwitternlp_complementToPOS > nerdANDstanfordANDuwtwitternlp_POStaggedInputForPostProcessingRules.mcoll ; cd .. ; done 
+    for x in {1..10} ; \
+      do cd $x ; \
+      paste -d" " nerdANDstanfordANDuwtwitternlp_postagged.conll nerdANDstanfordANDuwtwitternlp_complementToPOS > nerdANDstanfordANDuwtwitternlp_POStaggedInputForPostProcessingRules.mcoll ; \
+      cd .. ; \
+    done 
 
 
 Add naive gazetters. Run rules (_URL_ can't be an entity etc )Check the location of the RunNERDPostprocessingRules.pl script and adjust the path if necessary  
 
-    for x in {1..10} ; do cd $x ; perl ../../../RunNERDPostprocessingRules.pl nerdANDstanfordANDuwtwitternlp_POStaggedInputForPostProcessingRules.mcoll > nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration.mcoll ; cd .. ; done
+    for x in {1..10} ; \
+      do cd $x ; \
+      perl ../../../RunNERDPostprocessingRules.pl nerdANDstanfordANDuwtwitternlp_POStaggedInputForPostProcessingRules.mcoll > nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration.mcoll ; \
+      cd .. ; \
+    done
     
 
 Align with GS to reinsert _ENDOFTWEET_ tokens (needed for some ML features)
 
-    for x in {1..10} ; do cd $x ; perl ../../../alignGoldStandardWithNERDOutput.pl validation.GS nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration.mcoll | cut -f3 | sed 's/\%/percent/g'  > nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration_aligned.mcoll ; cd .. ; done  
+    for x in {1..10} ; \
+      do cd $x ; \
+      perl ../../../alignGoldStandardWithNERDOutput.pl validation.GS nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration.mcoll | cut -f3 | sed 's/\%/percent/g'  > nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration_aligned.mcoll ; \
+      cd .. ; \
+    done  
 
 
 Add ML features 
 
-    for x in {1..10} ; do cd $x ; perl ../../../AddMLFeaturesAndCLeanUp.pl nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration_aligned.mcoll > ../../MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part$x.mcoll ; cd .. ; done 
-    
+    for x in {1..10} ; \
+      do cd $x ; \
+      perl ../../../AddMLFeaturesAndCLeanUp.pl nerdANDstanfordANDuwtwitternlp_POStaggedPostProcessedInputForMLFeatureGeneration_aligned.mcoll > ../../MachineLearningExperiments/nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part$x.mcoll ; 
+      cd .. ; \
+    done 
     
 #### Licence
 These scripts are free software; you can redistribute it and/or modify it
