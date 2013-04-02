@@ -29,7 +29,7 @@ Create input file for pos tagger (make sure the file has two columns, even if th
     # the pos tagger assumes proper hashtags and urls, so insert some dummy values here
     for x in {1..10} ; \
       do cd $x ;\ 
-      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#pgroth/g' | gtr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
+      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#username/g' | gtr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
       cd .. ; \
     done
     # also put second part of the file somewhere 
@@ -42,7 +42,7 @@ Create input file for pos tagger (make sure the file has two columns, even if th
     for x in {1..10} ; \
       do cd $x ; \
       ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; \
-      s/\#pgroth/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; \
+      s/\#username/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; \
       cd .. ; \
     done
     # glue the files together 
@@ -114,7 +114,7 @@ Convert all csv files to arff and add big header:
     done 
 
 
-Launch a classifier. For the sake of brevity here is reported the KNN:
+Launch a classifier. For the sake of brevity here we reported how to run Weka's k-NN implementation:
 
     for x in {1..10}; \
     do \
