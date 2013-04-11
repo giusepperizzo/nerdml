@@ -35,7 +35,7 @@ Create input file for pos tagger (make sure the file has two columns, even if th
     # also put second part of the file somewhere 
     for x in {1..10} ; \ 
       do cd $x ;\
-      gcut -f2- -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; \
+      gcut -f2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; \
       cd .. ; \
     done
     # run the pos tagger (check the location of the tagger!)
