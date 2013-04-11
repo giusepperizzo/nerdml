@@ -29,7 +29,7 @@ Create input file for pos tagger (make sure the file has two columns, even if th
     # the pos tagger assumes proper hashtags and urls, so insert some dummy values here
     for x in {1..10} ; \
       do cd $x ;\ 
-      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#username/g' | gtr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
+      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#username/g' | tr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
       cd .. ; \
     done
     # also put second part of the file somewhere 
