@@ -29,19 +29,19 @@ Create input file for pos tagger (make sure the file has two columns, even if th
     # the pos tagger assumes proper hashtags and urls, so insert some dummy values here
     for x in {1..10} ; \
       do cd $x ;\ 
-      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | gsed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#username/g' | tr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
+      gcut -f1,2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll | sed 's/_Mention_/\@blabla/g ; s/_URL_/http:\/\/www.blabla.com/g ; s/_HASHTAG_/\#username/g' | tr " " "\t" > nerdANDstanfordANDuwtwitternlp_inputForPOS ; \
       cd .. ; \
     done
     # also put second part of the file somewhere 
     for x in {1..10} ; \ 
       do cd $x ;\
-      gcut -f2 -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; \
+      gcut -f2-14 -d" " < nerdANDstanfordANDuwtwitternlp.mconll > nerdANDstanfordANDuwtwitternlp_complementToPOS ; \
       cd .. ; \
     done
     # run the pos tagger (check the location of the tagger!)
     for x in {1..10} ; \
       do cd $x ; \
-      ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | gsed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; \
+      ark-tweet-nlp-0.3.2/runTagger.sh --input-format conll nerdANDstanfordANDuwtwitternlp_inputForPOS | gcut -f1,2 | gtr "\t" " " | sed 's/@blabla/_Mention_/g ; s/http:\/\/www.blabla.com/_URL_/g ; \
       s/\#username/_HASHTAG_/g' > nerdANDstanfordANDuwtwitternlp_postagged.conll ; \
       cd .. ; \
     done
@@ -85,15 +85,15 @@ Weka is slightly pickier than some other machine learning packages regarding its
 
     cd to/path/of/MachineLearningExperiments
     for x in *mcoll ; \
-      do echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > $x.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' >> $x.csv ; \
+      do echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > $x.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | tr " " "," | sed '/^$/d' >> $x.csv ; \
     done
 
     for x in *conll ; \
-      do echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > $x.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | gtr " " "," | sed '/^$/d' >> $x.csv ; \
+      do echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > $x.csv ; sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ; s/\%/percent/g ' < $x | sed "s/'/quote/g" | tr " " "," | sed '/^$/d' >> $x.csv ; \
     done 
 
     echo "token,pos,initcap,allcaps,prefix,suffix,capitalisationfrequency,start,end,alchemy,spotlight,extractiv,lupedia,opencalais,saplo,textrazor,wikimeta,yahoo,zemanta,stanford,ritter,class" > nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv ; 
-    cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll | sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ' | sed "s/'/quote/g ; s/\%/percent/g " | gtr " " "," | sed '/^$/d' >> nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv
+    cat nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part1.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part2.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part3.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part4.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part5.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part6.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part7.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part8.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part9.mcoll nerdANDstanfordANDuwtwitternlpANDmlFeatures_Part10.mcoll | sed 's/,/COMMA/g ; s/"/DQUOTE/g ; s/`/backtick/g ' | sed "s/'/quote/g ; s/\%/percent/g " | tr " " "," | sed '/^$/d' >> nerdANDstanfordANDuwtwitternlpANDmlFeatures_completeDataset.csv
 
 ##### classifier
 
